@@ -1,0 +1,96 @@
+.sucessoDoPedido{
+    width: 100%;
+    height: 110px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding-left: 100px;
+    padding-right: 100px;
+}
+
+.sucessoDoPedido span{
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 28px;
+    letter-spacing: 0.04em;
+    text-align: center;
+
+    color: #247A6B;
+
+}
+
+.infos{
+    width: 100%;
+    height: 110px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    padding-left: 29px;
+
+    margin-bottom: 10px;
+}
+
+.infos div{
+    margin-top: 5px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.titulo{
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 28px;
+    letter-spacing: 0.04em;
+    text-align: left;
+
+    color: #293845;
+}
+
+.detalhes{
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 26px;
+    letter-spacing: 0.04em;
+    text-align: left;
+
+    color: #293845;
+
+}
+
+.final{
+    width: 100%;
+
+    padding-left: 60px;
+    padding-right: 78px;
+
+    margin-top: 57px;
+
+    margin-bottom: 30px;
+}
+
+
+.voltarPraHome{
+    width: 255px;
+    height: 42px;
+
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 21px;
+    letter-spacing: 0.04em;
+    text-align: center;
+    color: #FFFFFF;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border: none;
+    border-radius: 3px;
+
+    background-color: #E8833A;
+}

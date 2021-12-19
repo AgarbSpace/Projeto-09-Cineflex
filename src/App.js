@@ -6,6 +6,8 @@ import SelecaoDeAssentos from "./SelecaoDeAssentos";
 import SessoesDoFilme from "./SessoesDoFilme";
 
 
+
+
 export default function App(){
 
     return(
@@ -15,6 +17,7 @@ export default function App(){
             <Route path = "/" element = {<PaginaDeInicio />}></Route>
             <Route path = "/sessoes/:idFilme" element = {<SessoesDoFilme />}></Route>
             <Route path = "/assentos/:idSessao" element = {<SelecaoDeAssentos/>}></Route>
+            <Route path = "/sucesso"></Route>
         </Routes>
         </BrowserRouter>
     )

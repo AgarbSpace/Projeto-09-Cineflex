@@ -1,14 +1,20 @@
 import { useEffect, useState } from "react"
-import { Link, useParams } from "react-router-dom"
+import { useParams } from "react-router-dom"
+import { useNavigate } from 'react-router';
 import axios from "axios"
+import SucessoNaReserva from "../SucessoNaReserva";
 import "./style.css"
 
 export default function SelecaoDeAssentos(){
     const [assentos, setAssentos] = useState(null)
     const [assentosSelecionados, setAssentosSelecionados] = useState([])
-    const [situacaoDoAssento, setSituacaoDoAssento] = useState("assento");
+    const [sessao, setSessao] = useState(null)
+    const [poster, setPoster] = useState(null)
     const [nomeDoComprador, setNomeDoComprador] = useState("")
     const [cpf, setCpf] = useState("")
+    const [situacaoDaReserva, setSituacaoDaReserva] = useState("nao reservado")
+    const [nomeDoAssento, setNomeDoAssento] = useState([])
+    let navegacao = useNavigate();
     const {idSessao} = useParams()
 
     useEffect(() => {
@@ -18,7 +24,21 @@ export default function SelecaoDeAssentos(){
         })
     }, [])
 
-    if(assentos === null) {
+    useEffect(() => {
+        const requisicaoPoster = axios.get(`https://mock-api.driven.com.br/api/v4/cineflex/showtimes/${idSessao}/seats`);
+        requisicaoPoster.then(respostaPoster => {
+            setPoster(respostaPoster.data.movie)
+        })
+    }, [])
+    
+    useEffect(() => {
+        const requisicaoSessao = axios.get(`https://mock-api.driven.com.br/api/v4/cineflex/showtimes/${idSessao}/seats`);
+        requisicaoSessao.then(respostaPoster => {
+            setSessao(respostaPoster.data)
+        })
+    }, [])
+
+    if(assentos === null || poster === null || sessao === null) {
         return(
             <section className="loading"> 
                 <img src="https://c.tenor.com/I6kN-6X7nhAAAAAj/loading-buffering.gif" alt = "carregando"/>
@@ -27,17 +47,32 @@ export default function SelecaoDeAssentos(){
         
 	}
 
-    const mapaDeIds = assentos.map(ids => ids.id);
-  
-    function selecionarAssento (e, idAssento){
+    function selecionarAssento (e, idAssento, nomeDoAssentoSelecionado){
         if(e.classList.contains("selecionado") === true){
             e.classList.remove("selecionado");
-            assentosSelecionados.splice(assentosSelecionados.indexOf(idAssento), 1)
-            setAssentosSelecionados([...assentosSelecionados])
+            nomeDoAssento.splice(nomeDoAssento.indexOf(nomeDoAssentoSelecionado), 1);
+            assentosSelecionados.splice(assentosSelecionados.indexOf(idAssento), 1);
+            setAssentosSelecionados([...assentosSelecionados]);
         }else{
             e.classList.add("selecionado");
             setAssentosSelecionados([...assentosSelecionados, idAssento]);
+            setNomeDoAssento([...nomeDoAssento, nomeDoAssentoSelecionado]);
         }
+    }
+
+    if(situacaoDaReserva === "reservado"){  
+        return (
+            <>
+            <SucessoNaReserva cpf = {cpf}
+            nome = {nomeDoComprador}
+            filme = {poster.title}
+            hora = {sessao.name}
+            diaDaSemana = {sessao.day.weekday}
+            dia = {sessao.day.date}
+            assentos = {nomeDoAssento}/>
+            </>
+        )
+
     }
 
     return(
@@ -47,8 +82,8 @@ export default function SelecaoDeAssentos(){
             </section>
             <section className="assentos">
                 {assentos.map(assentosSessao => <button key = {assentosSessao.id}
-                 className={(assentosSessao.isAvailable === true) ? situacaoDoAssento : 'assento indisponivel'} 
-                 onClick={(e) => selecionarAssento(e.target, assentosSessao.id)} >{assentosSessao.name}</button>)}
+                 className={(assentosSessao.isAvailable === true) ? "assento" : 'assento indisponivel'} 
+                 onClick={(e) => selecionarAssento(e.target, assentosSessao.id, assentosSessao.name)} >{assentosSessao.name}</button>)}
             </section>
 
             <section className="legenda">
@@ -78,15 +113,21 @@ export default function SelecaoDeAssentos(){
             </section>
             
             <section className="finalizarReserva">
-                <button className="botaoReservarAssento" onClick = {() => validarDados(nomeDoComprador, setNomeDoComprador, cpf, setCpf, assentosSelecionados)}>Reservar assento(s)</button>
+                <button className="botaoReservarAssento" onClick = {() => validarDados(nomeDoComprador, setNomeDoComprador, cpf, setCpf, assentosSelecionados, setSituacaoDaReserva, navegacao)}>Reservar assento(s)</button>
             </section>
+
+            <footer>
+                <div className="backgroundPoster">
+                    <img className="posterFooter" src = {poster.posterURL} alt = {poster.title}/>
+                </div>
+                <span>{poster.title}</span>
+            </footer>
         </>
         
     )
 }
 
-function validarDados(nome, setNomeDoComprador, cpf, setCpf, assentosSelecionados){
-    console.log(assentosSelecionados);
+function validarDados(nome, setNomeDoComprador, cpf, setCpf, assentosSelecionados, setSituacaoDaReserva, navegacao){
     
     if(nome.length < 5){
         alert("Por favor, insira um nome válido")
@@ -160,9 +201,10 @@ function validarDados(nome, setNomeDoComprador, cpf, setCpf, assentosSelecionado
         name: nome,
         cpf: cpf
     }
-    
-    const promessa = axios.post(`https://mock-api.driven.com.br/api/v4/cineflex/seats/book-many`, dados);
-    promessa.then(alert(`${nome} seu(s) assento(s) foram reservados com sucesso!`))
-    
+    if(assentosSelecionados.length > 0){
+        const promessa = axios.post(`https://mock-api.driven.com.br/api/v4/cineflex/seats/book-many`, dados);
+        promessa.then(alert(`${nome} Seu(s) ingresso(s) foram reservados com sucesso!`))
+        setSituacaoDaReserva("reservado")
+    }
 
 }
