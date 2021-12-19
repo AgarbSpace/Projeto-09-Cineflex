@@ -1,4 +1,5 @@
 import "./style.css"
+import { Link } from "react-router-dom";
 
 export default function SucessoNaReserva({nome, cpf, filme, hora, dia, assentos}){
     
@@ -30,7 +31,7 @@ export default function SucessoNaReserva({nome, cpf, filme, hora, dia, assentos}
                 </div>
             </section>
             <section className="final">
-            <button className="voltarPraHome" >Voltar pra home</button>
+            <Link to = "/"><button className="voltarPraHome" >Voltar pra home</button></Link>
             </section>
         </>
     )
